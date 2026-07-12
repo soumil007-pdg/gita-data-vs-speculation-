@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Gita Analysis Lab — Nine Methods, Fully Interactive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,400&family=Spectral:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#15120e;--bg2:#1c1811;--bg3:#221d16;--panel:#1e1912;
+  --line:#352d21;--lsoft:#2b2318;
+  --ink:#f0e8d6;--soft:#c3b69a;--faint:#8a7a62;
+  --saf:#e08a2e;--safb:#f5a83d;--gold:#d9b441;
+  --teal:#3fb59f;--ind:#9b8ce0;--crim:#e26d5c;
+  --rose:#e08aa8;--lime:#a8cc6a;--sky:#5fb8e0;
+  --glow:0 0 28px rgba(224,138,46,.22);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Spectral',Georgia,serif;background:var(--bg);color:var(--ink);line-height:1.7;font-size:17px;overflow-x:hidden;background-image:radial-gradient(circle at 85% 0,rgba(224,138,46,.07),transparent 42%),radial-gradient(circle at 5% 100%,rgba(63,181,159,.05),transparent 42%)}
+.wrap{max-width:1020px;margin:0 auto;padding:0 22px}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* NAV */
+.sitenav{position:sticky;top:0;z-index:100;background:rgba(21,18,14,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.sitenav-inner{max-width:1020px;margin:0 auto;padding:0 22px;display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.sitenav .brand{font-family:'Fraunces',serif;font-weight:600;font-size:16px;color:var(--saf);margin-right:auto;padding:12px 0}
+.sitenav .brand em{font-style:italic}
+.snb{font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 12px;border:none;background:transparent;color:var(--faint);cursor:pointer;border-bottom:2px solid transparent;transition:all .16s;letter-spacing:.02em}
+.snb:hover{color:var(--ink)}
+.snb.active{color:var(--safb);border-bottom-color:var(--saf)}
+
+/* HERO */
+.hero{padding:80px 0 50px}
+.ptag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--safb);margin-bottom:16px}
+.hero h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(36px,6vw,62px);line-height:1.04;letter-spacing:-.02em;max-width:20ch}
+.hero h1 em{font-style:italic;color:var(--safb)}
+.hero p{margin-top:20px;max-width:60ch;font-size:19px;color:var(--soft)}
+.pill{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal);border:1px solid rgba(63,181,159,.3);border-radius:20px;padding:6px 14px}
+.pill-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* SECTION */
+.lab-section{padding:70px 0;border-bottom:1px solid var(--lsoft)}
+.sec-tag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--safb);margin-bottom:10px}
+.lab-section h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(24px,4vw,38px);line-height:1.1;letter-spacing:-.01em;margin-bottom:10px}
+.lab-section h2 em{font-style:italic;color:var(--safb)}
+.intro{font-size:18px;color:var(--soft);max-width:64ch;margin-bottom:24px;line-height:1.65}
+
+/* PANEL */
+.pg{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin:20px 0}
+.pg-label{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+.pg-label .dot{width:7px;height:7px;border-radius:50%;background:var(--saf);box-shadow:0 0 8px var(--saf)}
+
+/* NOTES */
+.note{border-radius:11px;padding:18px 22px;margin:22px 0;font-size:15.5px;line-height:1.7}
+.note.kid{background:rgba(63,181,159,.08);border:1px solid rgba(63,181,159,.3)}
+.note.kid .nt{color:var(--teal)}
+.note.mem{background:rgba(155,140,224,.08);border:1px solid rgba(155,140,224,.3)}
+.note.mem .nt{color:var(--ind)}
+.note.warn{background:rgba(226,109,92,.08);border:1px solid rgba(226,109,92,.3)}
+.note.warn .nt{color:var(--crim)}
+.note .nt{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;margin-bottom:8px}
+
+/* CHIPS */
+.chip-area{display:flex;flex-wrap:wrap;gap:8px;padding:16px;min-height:70px;background:var(--bg);border-radius:10px;border:1px solid var(--lsoft);align-content:flex-start}
+.chip{font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 10px;border-radius:6px;background:var(--bg3);color:var(--soft);border:1px solid var(--line);transition:all .3s cubic-bezier(.22,1,.36,1);white-space:nowrap}
+.chip.removed{background:rgba(226,109,92,.14);border-color:var(--crim);color:var(--crim);text-decoration:line-through;opacity:.5}
+.chip.transformed{background:rgba(217,180,65,.16);border-color:var(--gold);color:var(--gold)}
+.chip.kept{background:rgba(63,181,159,.14);border-color:var(--teal);color:var(--teal)}
+
+/* CONTROLS */
+.ctrl-row{display:flex;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+.ctrl-label{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--soft);min-width:140px}
+.ctrl-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--safb);min-width:40px;text-align:right}
+input[type=range]{-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:var(--bg3);outline:none;flex:1;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--saf);cursor:pointer;box-shadow:0 0 10px rgba(224,138,46,.5);border:2px solid var(--bg)}
+
+/* TOGGLES */
+.toggle-group{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.toggle{font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 13px;border-radius:8px;border:1px solid var(--line);background:var(--bg3);color:var(--faint);cursor:pointer;transition:all .16s;user-select:none}
+.toggle:hover{color:var(--ink);border-color:var(--saf)}
+.toggle.on{background:var(--saf);color:#1a1410;border-color:var(--saf);font-weight:700;box-shadow:0 0 12px rgba(224,138,46,.35)}
+
+/* BUTTONS */
+.btn{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:10px 20px;border-radius:9px;border:none;cursor:pointer;background:var(--saf);color:#1a1410;transition:all .16s}
+.btn:hover{background:var(--safb);box-shadow:var(--glow)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--soft)}
+.btn.ghost:hover{border-color:var(--saf);color:var(--ink)}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.stat{background:var(--bg);border:1px solid var(--lsoft);border-radius:10px;padding:12px;text-align:center}
+.stat .v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--safb)}
+.stat .l{font-size:12px;color:var(--faint);margin-top:2px}
+
+/* CODE BUILDER */
+.builder{display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:14px;background:var(--bg);border-radius:10px;border:1px solid var(--lsoft);font-family:'JetBrains Mono',monospace;font-size:13px;margin:10px 0;line-height:2}
+.tok{padding:4px 9px;border-radius:5px;cursor:help;position:relative;transition:all .16s}
+.tok:hover{transform:translateY(-2px)}
+.tok.fn{background:rgba(63,181,159,.16);color:var(--teal)}
+.tok.kw{background:rgba(155,140,224,.16);color:var(--ind)}
+.tok.str{background:rgba(217,180,65,.16);color:var(--gold)}
+.tok.var{background:var(--bg3);color:var(--soft)}
+.tok.punct{color:var(--faint)}
+.tok .tip{position:absolute;bottom:130%;left:50%;transform:translateX(-50%);background:#0d0b08;border:1px solid var(--saf);border-radius:8px;padding:8px 12px;font-family:'Spectral',serif;font-size:13px;color:var(--ink);width:200px;text-align:center;opacity:0;pointer-events:none;transition:opacity .18s;z-index:10;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.tok:hover .tip{opacity:1}
+
+/* READOUT */
+.readout{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--bg);border:1px solid var(--lsoft);border-radius:10px;padding:14px 16px;margin:12px 0;color:var(--soft);line-height:1.9;overflow-x:auto;white-space:pre-wrap}
+.readout .hi{color:var(--safb);font-weight:700}
+.readout .g{color:var(--teal)}
+.readout .cm{color:var(--faint)}
+
+/* CANVAS */
+.canvas-wrap{position:relative;border-radius:12px;overflow:hidden;background:var(--bg);border:1px solid var(--lsoft);margin:14px 0}
+canvas{display:block;width:100%}
+
+code.ic{font-family:'JetBrains Mono',monospace;font-size:.86em;background:var(--bg3);padding:2px 7px;border-radius:5px;color:var(--gold)}
+
+/* HEATMAP */
+.heatmap-wrap{overflow-x:auto;margin:14px 0}
+table.hm{border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px;width:100%}
+table.hm th{background:var(--bg3);color:var(--faint);padding:6px 8px;text-align:center;font-weight:500;white-space:nowrap}
+table.hm td{padding:5px 7px;text-align:center;font-size:10px;color:var(--ink);transition:background .3s;white-space:nowrap}
+table.hm .row-label{text-align:left;color:var(--soft);font-size:11px;padding-right:10px;white-space:nowrap}
+
+/* BAR CHART */
+.bar-chart{margin:14px 0}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.bar-label{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--soft);min-width:100px;text-align:right}
+.bar-track{flex:1;height:20px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .5s cubic-bezier(.22,1,.36,1)}
+.bar-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);min-width:36px}
+
+/* LEGEND */
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--soft)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend .sw{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+
+/* SPEAKER BADGE */
+.speaker-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;margin:4px}
+.speaker-badge.k{background:rgba(224,138,46,.15);border:1px solid var(--saf);color:var(--safb)}
+.speaker-badge.a{background:rgba(63,181,159,.15);border:1px solid var(--teal);color:var(--teal)}
+.speaker-badge.s{background:rgba(155,140,224,.15);border:1px solid var(--ind);color:var(--ind)}
+
+/* VERSE CARD */
+.verse-card{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:10px 0;font-size:15px;color:var(--soft);line-height:1.7;font-style:italic}
+.verse-card .meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--faint);font-style:normal;margin-bottom:6px;letter-spacing:.08em}
+
+/* TABS */
+.tab-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tab{font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--faint);cursor:pointer;transition:all .16s}
+.tab.active{background:var(--saf);color:#1a1410;border-color:var(--saf);font-weight:700}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+footer{padding:80px 0;text-align:center;border-top:1px solid var(--lsoft)}
+footer .om{font-family:'Fraunces',serif;font-size:50px;color:var(--saf);margin-bottom:14px}
+footer p{color:var(--faint);font-size:14px;max-width:50ch;margin:0 auto;line-height:1.8}
+
+@media(max-width:680px){
+  body{font-size:16px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .ctrl-label{min-width:100px}
+  .sitenav-inner{gap:0}
+  .snb{font-size:10px;padding:8px 8px}
+}
+</style>
+</head>
+<body>
+
+<nav class="sitenav">
+  <div class="sitenav-inner">
+    <div class="brand">The <em>Gita</em> Lab</div>
+    <button class="snb" onclick="scrollTo('s1')">Load</button>
+    <button class="snb" onclick="scrollTo('s2')">Speaker</button>
+    <button class="snb" onclick="scrollTo('s3')">Distrib</button>
+    <button class="snb" onclick="scrollTo('s4')">Words</button>
+    <button class="snb" onclick="scrollTo('s5')">Emotions</button>
+    <button class="snb" onclick="scrollTo('s6')">Krishna Arc</button>
+    <button class="snb" onclick="scrollTo('s7')">Arjuna Arc</button>
+    <button class="snb" onclick="scrollTo('s8')">LDA</button>
+    <button class="snb" onclick="scrollTo('s9')">Readability</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="ptag">Complete Analysis Lab · 9 Methods</div>
+    <h1>How We Read the <em>Gita</em> with Code</h1>
+    <p>Every machine below is live. Flip toggles, drag sliders, click buttons — and watch the same decisions your code makes happen in front of you, step by step.</p>
+    <div class="pill"><span class="pill-dot"></span>700 verses · 18 chapters · 9 methods · all interactive</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 1 — LOAD DATA -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="lab-section" id="s1">
+<div class="wrap">
+  <div class="sec-tag">Section 1 · Setup</div>
+  <h2>Loading the <em>Dataset</em></h2>
+  <p class="intro">Before any analysis, we load the raw CSV and inspect it. This sounds boring — but missing this step means building on sand.</p>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>What the dataset looks like</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="v">700</div><div class="l">total verses</div></div>
+      <div class="stat"><div class="v">18</div><div class="l">chapters</div></div>
+      <div class="stat"><div class="v">4</div><div class="l">columns we keep</div></div>
+    </div>
+    <div class="readout"><span class="cm"># The dataset has a typo in the column name — spot it before you use it</span>
+<span class="hi">a_english</span> = a[['Title', 'Chapter', 'Verse', '<span class="hi">Enlgish</span> Translation']]
+<span class="cm">#                                               ↑ misspelled — "Enlgish" not "English"</span>
+<span class="cm"># Using 'English Translation' later would throw KeyError — always check first</span></div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>The columns we keep vs drop</div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('col',0)">Keep</button>
+      <button class="tab" onclick="switchTab('col',1)">Drop</button>
+    </div>
+    <div id="col-0" class="tab-panel active">
+      <div class="readout"><span class="g">✓ Chapter</span>     — which chapter the verse belongs to
+<span class="g">✓ Verse</span>       — verse number like 1.1, 2.47
+<span class="g">✓ Enlgish Translation</span> — the text we analyse
+<span class="g">✓ Title</span>       — chapter name (Karma Yoga, etc.)</div>
+    </div>
+    <div id="col-1" class="tab-panel">
+      <div class="readout"><span class="cm">✗ Sanskrit Anuvad</span>  — kept separately for LaBSE analysis
+<span class="cm">✗ Hindi Anuvad</span>     — kept separately for LaBSE analysis
+<span class="cm">✗ S.No.</span>            — just an index, pandas has its own</div>
+    </div>
+  </div>
+
+  <div class="note kid">
+    <div class="nt">◐ Why inspect before building</div>
+    The typo <code class="ic">Enlgish Translation</code> is in the actual CSV header. If you assumed the column was called <code class="ic">English Translation</code> and skipped the inspection step, every single subsequent cell would crash with a KeyError. Two seconds of <code class="ic">df.head()</code> saves an hour of debugging.
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 2 — SPEAKER DETECTION -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="lab-section" id="s2">
+<div class="wrap">
+  <div class="sec-tag">Section 2 · NLP</div>
+  <h2>Finding <em>Who</em> Said What</h2>
+  <p class="intro">700 verses. No speaker column. We built one from scratch using spaCy's dependency parser — finding the grammatical subject of every speech verb.</p>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>The core insight — subject of speech verb</div>
+    <p style="font-size:14px;color:var(--faint);margin-bottom:10px">Click a verse to see how the parser finds the speaker</p>
+    <div class="toggle-group">
+      <div class="toggle on" onclick="showVerse(0,this)">Verse 1.2</div>
+      <div class="toggle" onclick="showVerse(1,this)">Verse 2.2</div>
+      <div class="toggle" onclick="showVerse(2,this)">Verse 1.46</div>
+      <div class="toggle" onclick="showVerse(3,this)">Verse 3.1</div>
+    </div>
+    <div class="verse-card" id="verseText"></div>
+    <div class="readout" id="verseAnalysis"></div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Try it yourself — real spaCy, running on a live backend</div>
+    <p style="font-size:14px;color:var(--faint);margin-bottom:12px">Type a sentence below. This calls a real Flask + spaCy backend — actual <code class="ic">token.dep_</code>, actual <code class="ic">nsubj</code>, no simulation. Hover any word to see its full parse.</p>
+    <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+      <input id="liveInput" type="text" value="Arjuna asked the Lord why he must fight his own kinsmen" style="flex:1;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--ink);outline:none;min-width:200px" placeholder="Type any sentence...">
+      <button class="btn" onclick="parseSentence()" id="parseBtn">Parse →</button>
+    </div>
+    <div id="apiStatus" class="readout" style="display:none;margin-bottom:10px"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;padding:16px;background:var(--bg);border-radius:10px;border:1px solid var(--lsoft);min-height:60px;align-content:flex-start" id="liveTokens"></div>
+    <div class="legend" style="margin-top:12px">
+      <span><span class="sw" style="background:var(--saf)"></span>VERB (speech verb)</span>
+      <span><span class="sw" style="background:var(--teal)"></span>nsubj → Speaker</span>
+      <span><span class="sw" style="background:var(--ind)"></span>PROPN / NOUN</span>
+      <span><span class="sw" style="background:var(--faint)"></span>other</span>
+    </div>
+    <div class="readout" id="liveSpeakerOut" style="margin-top:10px">← hit Parse to see the result</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn ghost" onclick="setExample('Sanjaya explained: Now seeing that the army was ready')">Try: Sanjaya explained</button>
+      <button class="btn ghost" onclick="setExample('The Blessed Lord spoke unto Arjuna about the eternal soul')">Try: Blessed Lord spoke</button>
+      <button class="btn ghost" onclick="setExample('Arjuna asked the Lord why he must fight his own kinsmen')">Try: Arjuna asked</button>
+    </div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>The three-layer logic</div>
+    <div class="readout"><span class="cm">Layer 1 — Find a speech verb in the opening</span>
+speech_verbs = ['speak', 'explain', 'ask', 'say', 'tell', 
+                'conclude', 'declare', 'reply', 'narrate', ...]
+
+<span class="cm">Layer 2 — Find its grammatical subject (nsubj)</span>
+if <span class="hi">token.dep_ == "nsubj"</span> and token.head == speech_verb:
+    detected = token.text
+
+<span class="cm">Layer 3 — Carry forward if nothing found</span>
+if detected:
+    last_speaker = detected
+else:
+    speakers.append(<span class="hi">last_speaker</span>)  <span class="cm"># same speaker continues</span></div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>The two bugs we had to fix</div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('bug',0)">Bug 1 — Overwrite</button>
+      <button class="tab" onclick="switchTab('bug',1)">Bug 2 — Pronouns</button>
+    </div>
+    <div id="bug-0" class="tab-panel active">
+      <div class="verse-card">
+        <div class="meta">VERSE 1.2</div>
+        "Sanjaya <strong>explained</strong>: Now seeing that the army of the PANDAVAS was set up, the Prince DURYODHANA <strong>called</strong> his teacher..."
+      </div>
+      <div class="readout"><span class="cm"># Two speech verbs in one verse — loop kept overwriting</span>
+detected = "Sanjaya"   <span class="cm"># from "explained" — CORRECT</span>
+detected = "Duryodhana" <span class="cm"># from "called" — OVERWROTE — WRONG</span>
+
+<span class="cm"># Fix: break after first match</span>
+for other_token in doc:
+    if nsubj found:
+        detected = other_token.text
+        <span class="hi">break</span>  <span class="cm"># stop after first subject</span>
+if detected:
+    <span class="hi">break</span>  <span class="cm"># stop after first speech verb</span></div>
+    </div>
+    <div id="bug-1" class="tab-panel">
+      <div class="verse-card">
+        <div class="meta">VERSE 18.74 — Sanjaya speaking in first person</div>
+        "Sanjaya concluded: Thus my dear King, <strong>I</strong> have recounted..."
+      </div>
+      <div class="readout"><span class="cm"># spaCy correctly found "I" as nsubj — but "I" is not a name</span>
+detected = "I"   <span class="cm"># WRONG — carried forward as speaker</span>
+
+<span class="cm"># Fix: pronoun filter</span>
+pronouns = ['I', 'he', 'she', 'they', 'you', 'He', 'She', 
+            'son', 'Men', 'people', 'Brahma']
+if detected <span class="hi">in pronouns</span>:
+    detected = None  <span class="cm"># treat as not found → carry forward</span></div>
+    </div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Speaker name cleanup — the epithet problem</div>
+    <p style="font-size:14px;color:var(--faint);margin-bottom:12px">Krishna is called many names. Toggle each epithet to see who it maps to.</p>
+    <div class="toggle-group" id="epithetGroup"></div>
+    <div class="readout" id="epithetOut">← click an epithet above</div>
+  </div>
+
+  <div class="note kid">
+    <div class="nt">◐ Why not just use an ML model?</div>
+    We considered a Hugging Face speaker attribution model — but models trained on modern English news misread archaic Gita language ("The Blessed Lord spoke unto Arjuna"). Rules + dependency parsing gave us ~90% accuracy with zero false positives on clear markers. ML was only considered as a fallback for the hard 10%.
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 3 — SPEAKER DISTRIBUTION -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="lab-section" id="s3">
+<div class="wrap">
+  <div class="sec-tag">Section 3 · EDA</div>
+  <h2>Who Speaks — <em>How Much</em></h2>
+  <p class="intro">Once we had the speaker column, a single <code class="ic">value_counts()</code> revealed the dramatic imbalance. Krishna dominates. Arjuna questions. Everyone else is a walk-on.</p>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Verse count per speaker</div>
+    <div class="bar-chart" id="speakerBars"></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="v">80.6%</div><div class="l">Krishna's share</div></div>
+      <div class="stat"><div class="v">12.4%</div><div class="l">Arjuna's share</div></div>
+      <div class="stat"><div class="v">5.0%</div><div class="l">Sanjaya's share</div></div>
+    </div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Why we only analyse Krishna and Arjuna</div>
+    <div class="readout">Dhritarashtra  →  <span class="hi">1 verse</span>   — not enough for any arc
+Duryodhana     →  <span class="hi">13 verses</span>  — chapter 1 only, no journey
+Sanjaya        →  <span class="hi">35 verses</span>  — narrator, not a character with emotions
+
+Only <span class="g">Krishna (564)</span> and <span class="g">Arjuna (87)</span> have:
+  ✓ enough verses to spot patterns
+  ✓ a real emotional journey across chapters
+  ✓ distinct vocabulary worth comparing</div>
+  </div>
+
+  <div class="note mem">
+    <div class="nt">◆ The structural lesson</div>
+    This is not a dialogue of equals. Krishna speaks for 80% of the text. Arjuna asks — then goes nearly silent as Krishna teaches. The imbalance is not a data problem, it is the structure of the text itself. Any analysis that ignores this ratio will misread the Gita.
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 4 — WORD FREQUENCY -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="lab-section" id="s4">
+<div class="wrap">
+  <div class="sec-tag">Section 4 · Text Analysis</div>
+  <h2>What Words Do They <em>Actually</em> Use</h2>
+  <p class="intro">Strip the text down. Count what's left. The frequency list is a fingerprint — it tells you not just what each speaker talks about, but how they think.</p>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Live text cleaning — toggle each step</div>
+    <p style="font-size:14px;color:var(--faint);margin-bottom:10px">A real Arjuna verse — watch it get cleaned</p>
+    <div class="chip-area" id="wordCleanArea"></div>
+    <div class="toggle-group">
+      <div class="toggle" data-wstep="lower" onclick="toggleWordStep(this)">1 · lowercase</div>
+      <div class="toggle" data-wstep="punct" onclick="toggleWordStep(this)">2 · strip punctuation</div>
+      <div class="toggle" data-wstep="stop" onclick="toggleWordStep(this)">3 · remove stopwords</div>
+      <div class="toggle" data-wstep="noise" onclick="toggleWordStep(this)">4 · remove gita-noise</div>
+      <div class="toggle" data-wstep="short" onclick="toggleWordStep(this)">5 · remove short words (&lt;4 chars)</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="v" id="wIn">18</div><div class="l">words in</div></div>
+      <div class="stat"><div class="v" id="wOut">18</div><div class="l">words surviving</div></div>
+      <div class="stat"><div class="v" id="wPct">0%</div><div class="l">noise removed</div></div>
+    </div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Top words — Krishna vs Arjuna</div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('wfreq',0)">Krishna</button>
+      <button class="tab" onclick="switchTab('wfreq',1)">Arjuna</button>
+      <button class="tab" onclick="switchTab('wfreq',2)">Side by Side</button>
+    </div>
+    <div id="wfreq-0" class="tab-panel active">
+      <div class="bar-chart" id="krishnaWords"></div>
+    </div>
+    <div id="wfreq-1" class="tab-panel">
+      <div class="bar-chart" id="arjunaWords"></div>
+    </div>
+    <div id="wfreq-2" class="tab-panel">
+      <div class="readout"><span class="hi">Krishna</span>: world, mind, actions, supreme, beings, soul, nature, knowledge, senses, sacrifice, karma, divine, body, yoga, always
+<span class="g">Arjuna</span>: yoga, great, asked, supreme, divine, universe, form, mind, sannyaas, fight, cannot, life, eternal
+
+<span class="cm">ONLY Krishna uses:</span> world, beings, soul, nature, knowledge, senses, sacrifice, karma, body, always
+<span class="cm">ONLY Arjuna uses:</span> sannyaas, fight, cannot, asked, form
+<span class="cm">BOTH use:</span> mind, supreme, divine, yoga, life</div>
+    </div>
+  </div>
+
+  <div class="note kid">
+    <div class="nt">◐ What the fingerprint tells you</div>
+    Krishna's vocabulary is vast and universal — <em>world, beings, soul, nature, knowledge</em>. He's talking about everything. Arjuna's vocabulary is narrow and personal — <em>fight, cannot, asked, sannyaas</em>. He's confused about one situation. The word frequency isn't just counting — it's revealing two completely different modes of mind.
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 5 — GoEMOTIONS PSYCHOLOGICAL MAP -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="lab-section" id="s5">
+<div class="wrap">
+  <div class="sec-tag">Section 5 · Deep NLP</div>
+  <h2>The Psychological Map — <em>All 700 Verses</em></h2>
+  <p class="intro">We ran every verse through <code class="ic">SamLowe/roberta-base-go_emotions</code> — a RoBERTa model fine-tuned on 58,000 Reddit comments across 28 emotion categories. The result is an emotion fingerprint for every verse in the Gita.</p>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Why GoEmotions over a simpler model</div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('model',0)">j-hartmann (7 emotions)</button>
+      <button class="tab" onclick="switchTab('model',1)">GoEmotions (28 emotions)</button>
+    </div>
+    <div id="model-0" class="tab-panel active">
+      <div class="readout">Model: j-hartmann/emotion-english-distilroberta-base
+Emotions: joy, sadness, anger, fear, surprise, disgust, neutral
+
+Problem for the Gita:
+  "The soul cannot be cut by weapons" → classified as <span class="hi">neutral</span>
+  "I bow before Your infinite greatness" → classified as <span class="hi">joy</span>
+  
+These are philosophically <em>admiration</em> and <em>realization</em> — 
+not neutral or simple joy. 7 buckets are too crude.</div>
+    </div>
+    <div id="model-1" class="tab-panel active" style="display:block">
+      <div class="readout">Model: SamLowe/roberta-base-go_emotions  ← <span class="g">what we used</span>
+Emotions: 28 categories including admiration, realization, 
+          curiosity, caring, approval, awe, relief, pride...
+
+"The soul cannot be cut by weapons" → <span class="g">realization (0.52)</span>
+"I bow before Your infinite greatness" → <span class="g">admiration (0.71)</span>
+
+These map to the philosophical texture of the Gita.
+28 emotions gives you nuance. 7 gives you noise.</div>
+    </div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>How the pipeline works</div>
+    <div class="readout"><span class="cm"># One call to classify all 700 verses at once</span>
+verse_list = a_english['Enlgish Translation'].<span class="hi">astype(str).tolist()</span>
+raw_results = emotion_classifier(verse_list)
+
+<span class="cm"># Each verse returns 28 dictionaries — one per emotion</span>
+raw_results[0][0]  <span class="cm"># → [{'label': 'admiration', 'score': 0.51}, ...]</span>
+
+<span class="cm"># top_k=None means we get ALL 28 emotions, not just the winner</span>
+<span class="cm"># This lets us track subtle emotions that aren't #1 but still present</span></div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Top emotions across all 700 verses — click to explore</div>
+    <div class="bar-chart" id="allEmotionBars"></div>
+    <div class="note warn" style="margin-top:14px">
+      <div class="nt">! Why neutral dominates</div>
+      Neutral scores 400+ because many Gita verses are philosophical statements with no strong single emotion — they carry teaching, not feeling. We remove neutral from per-speaker heatmaps to reveal the emotions that actually differentiate chapters.
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 6 — KRISHNA ARC -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="lab-section" id="s6">
+<div class="wrap">
+  <div class="sec-tag">Section 6 · Emotional Arc</div>
+  <h2>Krishna's <em>Emotional Journey</em> Across 18 Chapters</h2>
+  <p class="intro">564 verses. 18 chapters. We averaged all 28 emotion scores per chapter to find where Krishna's teaching mood shifts — from approval to caring to love at the cosmic vision.</p>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>What the heatmap reveals — key chapters</div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('karc',0)">approval</button>
+      <button class="tab" onclick="switchTab('karc',1)">caring</button>
+      <button class="tab" onclick="switchTab('karc',2)">admiration</button>
+      <button class="tab" onclick="switchTab('karc',3)">joy</button>
+    </div>
+    <div id="karc-0" class="tab-panel active">
+      <div class="readout">approval peaks at <span class="hi">Ch5 (0.21)</span> and <span class="hi">Ch17 (0.22)</span>
+
+Ch5 = Karma-Sannyasa Yoga — "both paths lead to liberation"
+  Krishna approves of those who renounce selfish desire
+
+Ch17 = Three kinds of faith — "faith shapes the person"  
+  Krishna approves of those who worship with pure intent
+
+Pattern: approval rises whenever Krishna validates a path</div>
+    </div>
+    <div id="karc-1" class="tab-panel">
+      <div class="readout">caring peaks at <span class="hi">Ch11 (0.18)</span> — the Vishwaroop chapter
+
+Arjuna has just seen the terrifying cosmic form.
+He is overwhelmed, trembling, begging for mercy.
+Krishna's caring spikes — he consoles, reassures, 
+and returns to his gentle human form.
+
+This is the most emotionally intimate moment 
+in the entire text — and the model caught it.</div>
+    </div>
+    <div id="karc-2" class="tab-panel">
+      <div class="readout">admiration peaks at <span class="hi">Ch9 (0.18)</span> — Raja Vidya Yoga
+
+Ch9 = "The Royal Knowledge, the Royal Secret"
+Krishna reveals his supreme omnipresence:
+"I am the ritual. I am the sacrifice. I am the father..."
+
+The model reads this as admiration — which makes sense.
+Krishna is admiring his own cosmic nature as he describes it.
+This is devotional self-revelation.</div>
+    </div>
+    <div id="karc-3" class="tab-panel">
+      <div class="readout">joy peaks at <span class="hi">Ch4 (0.11)</span> — Jnana-Karma-Sanyasa Yoga
+
+Ch4 is where Krishna reveals the ancient lineage of yoga:
+"I taught this to Vivaswan, who taught Manu, who taught Ikshvaku..."
+
+Then: "You are My dear devotee and friend — so I reveal this to you"
+
+The joy is relational — the intimacy of 
+teacher choosing student across millennia.</div>
+    </div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>The pipeline — from speaker filter to heatmap</div>
+    <div class="readout"><span class="cm"># Step 1: Filter by SPEAKER column — not by name mention in text</span>
+a_krishna = a_english[a_english['Speaker'] <span class="hi">== 'Krishna'</span>].copy()
+
+<span class="cm"># Step 2: Run GoEmotions on Krishna's 564 verses</span>
+results = emotion_classifier(a_krishna['Enlgish Translation'].tolist())
+
+<span class="cm"># Step 3: Convert to 28-column dataframe — one row per verse</span>
+emotion_rows = [{d['label']: d['score'] for d in verse} for verse in results]
+emotion_df = pd.DataFrame(emotion_rows)
+
+<span class="cm"># Step 4: Average by chapter — collapse 564 rows to 18 chapters</span>
+chapter_emotions = emotion_df.groupby('Chapter').<span class="hi">mean()</span>
+
+<span class="cm"># Step 5: Remove neutral — it drowns everything else</span>
+top = chapter_emotions.mean().nlargest(10).index
+top_filtered = [e for e in top if e != 'neutral']</div>
+  </div>
+
+  <div class="note mem">
+    <div class="nt">◆ Krishna's emotional fingerprint</div>
+    Top emotions: <strong>approval, admiration, caring, joy, love, optimism</strong>. This is the vocabulary of a teacher who is deeply invested in the student's wellbeing — not a detached philosopher. Even in the most abstract philosophical chapters, the emotional baseline is positive and relational.
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 7 — ARJUNA ARC -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="lab-section" id="s7">
+<div class="wrap">
+  <div class="sec-tag">Section 7 · Emotional Arc</div>
+  <h2>Arjuna's <em>Arc</em> — The Corrected Method</h2>
+  <p class="intro">This section had a methodological error in the original code. We fixed it. Understanding why it was wrong is as important as the result.</p>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>The bug and why it matters</div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('abug',0)">Wrong method</button>
+      <button class="tab" onclick="switchTab('abug',1)">Correct method</button>
+    </div>
+    <div id="abug-0" class="tab-panel active">
+      <div class="readout"><span class="cm"># WRONG — what we originally wrote</span>
+arjuna_arc = a1[a1['Enlgish Translation'].<span class="hi">str.contains('arjuna', case=False)</span>]
+
+<span class="cm"># This finds every verse that MENTIONS the word "arjuna"</span>
+<span class="cm"># But most of those are Krishna or Sanjaya TALKING ABOUT Arjuna</span>
+
+Example wrong inclusions:
+  "Krishna spoke to ARJUNA: The soul is eternal..."  ← Krishna speaking
+  "Sanjaya said: Then ARJUNA, seeing the armies..." ← Sanjaya speaking
+  
+Result: ~300 verses, mostly NOT Arjuna's voice at all</div>
+    </div>
+    <div id="abug-1" class="tab-panel">
+      <div class="readout"><span class="cm"># CORRECT — filter by the Speaker column we built</span>
+a_arjuna = a_english[a_english['Speaker'] <span class="hi">== 'Arjuna'</span>].copy()
+
+<span class="cm"># This finds only the 87 verses where Arjuna is speaking</span>
+<span class="cm"># Every row has been verified by the dependency parser</span>
+
+Result: <span class="g">87 verses — Arjuna's actual voice</span>
+
+The lesson: filtering by text content ≠ filtering by speaker.
+Build the speaker column first. Use it for everything after.</div>
+    </div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>What Arjuna's arc actually shows</div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('aarc',0)">curiosity</button>
+      <button class="tab" onclick="switchTab('aarc',1)">confusion</button>
+      <button class="tab" onclick="switchTab('aarc',2)">sadness</button>
+    </div>
+    <div id="aarc-0" class="tab-panel active">
+      <div class="readout">curiosity dominates Arjuna's arc — peaks at <span class="hi">Ch17 (0.55)</span>
+
+Ch17 = Arjuna asks about those who worship with faith 
+       but without following scriptural rules
+
+This is Arjuna's fundamental mode: <em>genuine questioning</em>
+He doesn't lecture — he asks. Curiosity is not just an emotion
+here, it's a personality trait confirmed by the data.</div>
+    </div>
+    <div id="aarc-1" class="tab-panel">
+      <div class="readout">confusion peaks at <span class="hi">Ch3 (0.36)</span> — Karma Yoga
+
+Ch3 is where Arjuna says:
+"If knowledge is better than action, why do you push me to fight?"
+This is his most confused moment — two teachings seem contradictory.
+
+The model caught the structural hinge of the text:
+where Arjuna is most lost is where <span class="hi">the teaching is most needed</span></div>
+    </div>
+    <div id="aarc-2" class="tab-panel">
+      <div class="readout">sadness highest at <span class="hi">Ch1 (0.13)</span> — then drops steadily
+
+Ch1: Arjuna collapses on the battlefield, bow falls from hands
+Ch2: Sadness persists but questioning begins
+Ch3-18: Sadness fades as understanding grows
+
+This is the dramatic arc of the entire text — 
+grief → confusion → questioning → clarity
+The model traced it without being told.</div>
+    </div>
+  </div>
+
+  <div class="note kid">
+    <div class="nt">◐ Krishna vs Arjuna — the contrast</div>
+    Krishna's top emotion: <strong>approval</strong>. Arjuna's top emotion: <strong>curiosity</strong>. One is a teacher who validates. One is a student who questions. The emotion model confirmed what any careful reader feels — these two characters have fundamentally different relationships to knowledge.
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 8 — LDA -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="lab-section" id="s8">
+<div class="wrap">
+  <div class="sec-tag">Section 8 · Topic Modeling</div>
+  <h2>The Hidden <em>Themes</em> — LDA on 18 Chapters</h2>
+  <p class="intro">We grouped all verses by chapter, cleaned the text, and ran LDA to discover 7 recurring philosophical themes — without telling the algorithm what to look for.</p>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>The 5-step pipeline</div>
+    <div class="readout"><span class="cm">Step 1 — Group all verses by chapter (18 documents)</span>
+chapters = a2.groupby('Chapter')['Enlgish Translation']
+            .agg(lambda x: ' '.join(x))
+
+<span class="cm">Step 2 — Clean: lowercase → remove punctuation → stopwords → lemmatize</span>
+cleaned_docs = [cleaning(text) for text in chapters]
+
+<span class="cm">Step 3 — Build dictionary and corpus</span>
+dictionary = corpora.Dictionary(cleaned_docs)
+dictionary.<span class="hi">filter_extremes</span>(no_below=2, no_above=0.85)
+corpus = [dictionary.doc2bow(doc) for doc in cleaned_docs]
+
+<span class="cm">Step 4 — Find optimal K using coherence score</span>
+<span class="cm">Step 5 — Train LDA with K=7, name the topics</span></div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Interactive coherence explorer — drag to find optimal K</div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">num_topics (K)</span>
+      <input type="range" id="cohSlider" min="2" max="14" value="7" step="1" oninput="updateCoherence(this.value)">
+      <span class="ctrl-val" id="cohVal">7</span>
+    </div>
+    <div class="canvas-wrap"><canvas id="cohCanvas" height="180"></canvas></div>
+    <div class="readout" id="cohVerdict"></div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>The 7 discovered topics — click to explore</div>
+    <div class="toggle-group" id="topicToggles"></div>
+    <div class="readout" id="topicDetail"></div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Where each topic lives — thematic arc</div>
+    <div class="heatmap-wrap" id="ldaHeatmap"></div>
+  </div>
+
+  <div class="note warn">
+    <div class="nt">! Why we chose chapter-level not verse-level LDA</div>
+    Running LDA on individual verses gives 700 tiny documents — most too short for meaningful topic signals. Grouping by chapter gives 18 richer documents where co-occurrences can be detected reliably. The tradeoff: we lose verse-level granularity but gain chapter-level clarity.
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 9 — READABILITY -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="lab-section" id="s9">
+<div class="wrap">
+  <div class="sec-tag">Section 9 · Readability</div>
+  <h2>How Complex Is the <em>Language</em> — Chapter by Chapter</h2>
+  <p class="intro">We used the Flesch-Kincaid Grade Level formula on every verse and averaged by chapter. The result reveals which chapters demand the most from a reader — and why.</p>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>How Flesch-Kincaid Grade Level works</div>
+    <div class="readout"><span class="cm"># Formula</span>
+Grade = 0.39 × (words/sentences) + 11.8 × (syllables/words) - 15.59
+
+<span class="cm"># In plain terms:</span>
+Higher score = longer sentences + longer words = harder to read
+Lower score  = shorter sentences + shorter words = easier to read
+
+Grade 8  → 8th grade reading level
+Grade 12 → High school senior level
+Grade 16 → College level</div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>Grade level by chapter — drag to explore</div>
+    <div class="canvas-wrap"><canvas id="readCanvas" height="220"></canvas></div>
+    <div class="readout" id="readVerdict">← hover a chapter bar to see details</div>
+  </div>
+
+  <div class="pg">
+    <div class="pg-label"><span class="dot"></span>What spikes and dips mean</div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('read',0)">Hardest chapters</button>
+      <button class="tab" onclick="switchTab('read',1)">Easiest chapters</button>
+    </div>
+    <div id="read-0" class="tab-panel active">
+      <div class="readout">Chapter 11 — Vishwaroop (cosmic vision)
+  Longest, most complex sentences in the text
+  Arjuna describes an infinite, terrifying form — 
+  language itself strains under the weight
+
+Chapter 13 — Kshetra and Kshetrajna (field and knower)
+  Dense philosophical taxonomy — body, soul, nature, spirit
+  Technical vocabulary compressed into short verses</div>
+    </div>
+    <div id="read-1" class="tab-panel">
+      <div class="readout">Chapter 1 — Arjuna's Vishada (the battlefield)
+  Narrative prose — names, events, descriptions
+  The most accessible chapter — this is story, not philosophy
+
+Chapter 17 — Three kinds of faith (food, sacrifice, gifts)
+  Concrete categories, practical examples
+  Krishna classifying observable behaviors — simpler language</div>
+    </div>
+  </div>
+
+  <div class="note kid">
+    <div class="nt">◐ The pattern this reveals</div>
+    Chapters with concrete narrative or practical classification tend to score lower (easier). Chapters with abstract philosophical taxonomy — soul, field, knower, the unmanifest — score higher. The Gita's difficulty is not uniform. It builds in waves, peaks at the cosmic vision, then descends as it returns to practical instruction in Chapter 18.
+  </div>
+</div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="om">ॐ</div>
+    <p>Nine methods. One text. 700 verses decoded from data upward — speaker by speaker, emotion by emotion, theme by theme.</p>
+    <p style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px">spaCy · GoEmotions · LDA · LaBSE · textstat · pandas · seaborn</p>
+  </div>
+</footer>
+
+<script>
+// ─── SCROLL ───
+function scrollTo(id){document.getElementById(id).scrollIntoView({behavior:'smooth'})}
+
+// ─── TABS ───
+function switchTab(group,idx){
+  document.querySelectorAll(`#${group}-${idx}`).forEach(()=>{});
+  const panels=document.querySelectorAll(`[id^="${group}-"]`);
+  panels.forEach((p,i)=>{p.style.display=i===idx?'block':'none'});
+  const tabs=document.querySelectorAll(`.tab[onclick*="'${group}'"]`);
+  tabs.forEach((t,i)=>{t.classList.toggle('active',i===idx)});
+}
+
+// ─── SECTION 2: VERSE EXAMPLES ───
+const verses=[
+  {text:`"Sanjaya explained: Now seeing that the army of the PANDAVAS was set up properly, the Prince DURYODHANA called his teacher, DRONA, to his side and spoke these words:"`,
+   analysis:`Sentence parsed by spaCy:
+  "Sanjaya"  → dep_="<span class="hi">nsubj</span>", head="explained"  ← SPEAKER FOUND
+  "explained" → pos_="VERB", lemma="explain" → in speech_verbs ✓
+  "DURYODHANA" → dep_="nsubj", head="called" → speech verb too BUT...
+  
+  break fires after first match → Speaker = <span class="g">Sanjaya</span> ✓`},
+  {text:`"The Blessed Lord asked of Arjuna: Dear Arjuna, why have you been struck with fear, guilt and sorrow at this moment?"`,
+   analysis:`"Lord"   → dep_="<span class="hi">nsubj</span>", head="asked"  ← detected = "Lord"
+"asked"  → in speech_verbs ✓
+"Arjuna" → this is the OBJECT being addressed, not the subject
+
+After speaker_map:
+  "Lord" → <span class="g">"Krishna"</span> ✓`},
+  {text:`"Sanjaya said: Having said this, ARJUNA, still extremely sad and confused sat on the seat of his chariot throwing away his bow and arrows."`,
+   analysis:`"Sanjaya" → dep_="<span class="hi">nsubj</span>", head="said"  ← SPEAKER FOUND
+Speaker = <span class="g">Sanjaya</span> ✓
+
+Note: "ARJUNA" appears in the sentence but as the TOPIC of 
+Sanjaya's narration — not the speaker. Dependency parsing 
+correctly ignores it.`},
+  {text:`"Arjuna asked the Lord: O Lord KRISHNA, if you claim that Gyan or Knowledge is better than one's Karma, then why do you ask me to fight this battle?"`,
+   analysis:`"Arjuna" → dep_="<span class="hi">nsubj</span>", head="asked"  ← SPEAKER FOUND
+"asked"  → in speech_verbs ✓
+Speaker = <span class="g">Arjuna</span> ✓
+
+Note: "KRISHNA" appears but as the person being addressed.
+The parser correctly identifies Arjuna as grammatical subject.`}
+];
+let activeVerseToggle=null;
+function showVerse(i,el){
+  if(activeVerseToggle)activeVerseToggle.classList.remove('on');
+  el.classList.add('on');activeVerseToggle=el;
+  document.getElementById('verseText').innerHTML=`<div class="meta">VERSE EXAMPLE ${i+1}</div>${verses[i].text}`;
+  document.getElementById('verseAnalysis').innerHTML=verses[i].analysis;
+}
+showVerse(0,document.querySelectorAll('#s2 .toggle')[0]);
+
+// ─── EPITHETS ───
+const epithets=[
+  {name:'Lord',speaker:'Krishna',why:'Most common attribution phrase — "The Blessed Lord said"'},
+  {name:'HRISHIKESA',speaker:'Krishna',why:'Sanskrit epithet meaning "Lord of the Senses"'},
+  {name:'Almighty',speaker:'Krishna',why:'Used in translations to describe the Supreme Lord'},
+  {name:'Madhusudana',speaker:'Krishna',why:'Slayer of Madhu — a demon — one of Krishna\'s epithets'},
+  {name:'Govinda',speaker:'Krishna',why:'Protector of cows — a beloved name for Krishna'},
+  {name:'Sanjay',speaker:'Sanjaya',why:'Short form variant of Sanjaya — same narrator'},
+  {name:'Partha',speaker:'Arjuna',why:'Son of Pritha (Kunti) — patronymic for Arjuna (as addressee, not speaker)'},
+];
+const eg=document.getElementById('epithetGroup');
+epithets.forEach((e,i)=>{
+  const d=document.createElement('div');
+  d.className='toggle';d.textContent=e.name;
+  d.onclick=()=>{
+    document.querySelectorAll('#epithetGroup .toggle').forEach(x=>x.classList.remove('on'));
+    d.classList.add('on');
+    const col=e.speaker==='Krishna'?'var(--saf)':e.speaker==='Sanjaya'?'var(--ind)':'var(--teal)';
+    document.getElementById('epithetOut').innerHTML=`<span style="color:${col};font-weight:700">${e.name}</span> → <span style="color:${col}">${e.speaker}</span>\n\n${e.why}`;
+  };
+  eg.appendChild(d);
+});
+
+// ─── SECTION 3: SPEAKER BARS ───
+const speakerData=[{name:'Krishna',count:564,col:'var(--saf)'},{name:'Arjuna',count:87,col:'var(--teal)'},{name:'Sanjaya',count:35,col:'var(--ind)'},{name:'Duryodhana',count:13,col:'var(--rose)'},{name:'Dhrtarashtra',count:1,col:'var(--faint)'}];
+const sb=document.getElementById('speakerBars');
+speakerData.forEach(d=>{
+  const pct=Math.round(d.count/700*100);
+  sb.innerHTML+=`<div class="bar-row"><div class="bar-label">${d.name}</div><div class="bar-track"><div class="bar-fill" style="width:${d.count/564*100}%;background:${d.col}"></div></div><div class="bar-val">${d.count}</div></div>`;
+});
+
+// ─── SECTION 4: WORD CLEANING ───
+const arjunaVerse=[
+  {text:'O',lower:'o',stop:true},
+  {text:'KRISHNA',lower:'krishna',noise:true},
+  {text:'seeing',lower:'seeing',lemma:'see',keep:true},
+  {text:'my',lower:'my',stop:true},
+  {text:'kinsmen',lower:'kinsmen',lemma:'kinsman',keep:true},
+  {text:'(relatives)',lower:'(relatives)',punct:true,lemma:'relative',keep:true},
+  {text:'standing',lower:'standing',lemma:'stand',keep:true},
+  {text:'before',lower:'before',stop:true},
+  {text:'me',lower:'me',stop:true},
+  {text:'to',lower:'to',stop:true},
+  {text:'fight',lower:'fight',lemma:'fight',keep:true},
+  {text:'against',lower:'against',stop:true},
+  {text:'me',lower:'me',stop:true},
+  {text:'in',lower:'in',stop:true},
+  {text:'this',lower:'this',stop:true},
+  {text:'war,',lower:'war,',punct:true,lemma:'war',keep:true},
+  {text:'I',lower:'i',stop:true},
+  {text:'find',lower:'find',lemma:'find',short:true},
+];
+const wsteps={lower:false,punct:false,stop:false,noise:false,short:false};
+function renderWordClean(){
+  const area=document.getElementById('wordCleanArea');
+  let kept=0;
+  area.innerHTML=arjunaVerse.map(w=>{
+    let text=w.text;let cls='chip';let removed=false;
+    if(wsteps.lower)text=w.lower||text;
+    if(wsteps.punct&&w.punct){text=text.replace(/[^a-z\s]/gi,'');if(!text.trim()){removed=true;}}
+    if(wsteps.stop&&w.stop){removed=true;}
+    if(wsteps.noise&&w.noise){removed=true;}
+    if(wsteps.short&&w.short&&!removed){removed=true;}
+    if(removed){cls+=' removed';}else{kept++;if(w.lemma&&(wsteps.stop||wsteps.noise)){cls+=' transformed';text=w.lemma;}else if(w.keep){cls+=' kept';}}
+    return `<div class="${cls}">${text||w.text}</div>`;
+  }).join('');
+  const total=arjunaVerse.length;
+  document.getElementById('wIn').textContent=total;
+  document.getElementById('wOut').textContent=kept;
+  document.getElementById('wPct').textContent=Math.round((total-kept)/total*100)+'%';
+}
+function toggleWordStep(el){
+  const s=el.dataset.wstep;wsteps[s]=!wsteps[s];el.classList.toggle('on');renderWordClean();
+}
+renderWordClean();
+
+// WORD FREQ BARS
+const kwords=[{w:'world',c:125},{w:'mind',c:107},{w:'actions',c:95},{w:'supreme',c:91},{w:'beings',c:79},{w:'soul',c:75},{w:'nature',c:75},{w:'knowledge',c:68},{w:'senses',c:63},{w:'sacrifice',c:63},{w:'karma',c:61},{w:'divine',c:60},{w:'body',c:52},{w:'yoga',c:52},{w:'always',c:51}];
+const awords=[{w:'yoga',c:15},{w:'great',c:15},{w:'asked',c:13},{w:'supreme',c:13},{w:'divine',c:12},{w:'universe',c:12},{w:'form',c:10},{w:'mind',c:9},{w:'sannyaas',c:8},{w:'fight',c:7},{w:'cannot',c:7},{w:'life',c:7},{w:'eternal',c:7},{w:'good',c:6},{w:'worlds',c:6}];
+function makeWordBars(data,col,containerId){
+  const max=data[0].c;
+  document.getElementById(containerId).innerHTML=data.map(d=>`<div class="bar-row"><div class="bar-label">${d.w}</div><div class="bar-track"><div class="bar-fill" style="width:${d.c/max*100}%;background:${col}"></div></div><div class="bar-val">${d.c}</div></div>`).join('');
+}
+makeWordBars(kwords,'var(--saf)','krishnaWords');
+makeWordBars(awords,'var(--teal)','arjunaWords');
+
+// ─── SECTION 5: ALL EMOTION BARS ───
+const allEmotions=[{e:'neutral',c:412,col:'#8a7a62'},{e:'approval',c:89,col:'#3fb59f'},{e:'admiration',c:67,col:'#e08a2e'},{e:'caring',c:54,col:'#e08aa8'},{e:'realization',c:38,col:'#9b8ce0'},{e:'joy',c:34,col:'#f5a83d'},{e:'love',c:28,col:'#e26d5c'},{e:'optimism',c:24,col:'#a8cc6a'},{e:'curiosity',c:21,col:'#5fb8e0'},{e:'disapproval',c:18,col:'#d9b441'}];
+const aeb=document.getElementById('allEmotionBars');
+allEmotions.forEach(d=>{
+  aeb.innerHTML+=`<div class="bar-row"><div class="bar-label" style="min-width:110px">${d.e}</div><div class="bar-track"><div class="bar-fill" style="width:${d.c/412*100}%;background:${d.col}"></div></div><div class="bar-val">${d.c}</div></div>`;
+});
+
+// ─── SECTION 8: COHERENCE ───
+const cohData=[0,0,0.38,0.41,0.45,0.52,0.58,0.63,0.61,0.57,0.53,0.49,0.46,0.43,0.41];
+function drawCoherence(k){
+  const cv=document.getElementById('cohCanvas');
+  const ctx=cv.getContext('2d');
+  const W=cv.width=cv.offsetWidth*window.devicePixelRatio;
+  const H=cv.height=180*window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+  const w=cv.offsetWidth,h=180;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='#1c1811';ctx.fillRect(0,0,w,h);
+  const pad={t:20,b:30,l:40,r:20};
+  const cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  const pts=cohData.slice(2);
+  const max=Math.max(...pts)+0.05;
+  function cx(i){return pad.l+i/(pts.length-1)*cw;}
+  function cy(v){return pad.t+ch-(v/max)*ch;}
+  // grid
+  ctx.strokeStyle='#2b2318';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=pad.t+i*ch/4;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();}
+  // line
+  ctx.beginPath();ctx.strokeStyle='#e08a2e';ctx.lineWidth=2;
+  pts.forEach((v,i)=>{if(i===0)ctx.moveTo(cx(i),cy(v));else ctx.lineTo(cx(i),cy(v));});
+  ctx.stroke();
+  // fill
+  ctx.beginPath();pts.forEach((v,i)=>{if(i===0)ctx.moveTo(cx(i),cy(v));else ctx.lineTo(cx(i),cy(v));});
+  ctx.lineTo(cx(pts.length-1),pad.t+ch);ctx.lineTo(cx(0),pad.t+ch);ctx.closePath();
+  ctx.fillStyle='rgba(224,138,46,.08)';ctx.fill();
+  // dots
+  pts.forEach((v,i)=>{
+    const x=cx(i),y=cy(v),n=i+2;
+    const isK=n===k;
+    ctx.beginPath();ctx.arc(x,y,isK?7:4,0,Math.PI*2);
+    ctx.fillStyle=isK?'#f5a83d':'#352d21';ctx.fill();
+    ctx.strokeStyle=isK?'#f5a83d':'#8a7a62';ctx.lineWidth=isK?2:1;ctx.stroke();
+    ctx.fillStyle=isK?'#1a1410':'#8a7a62';ctx.font=`${isK?'700 ':''}${isK?11:9}px JetBrains Mono,monospace`;
+    ctx.textAlign='center';ctx.fillText(n,x,isK?y+4:y+3);
+  });
+}
+function updateCoherence(v){
+  const k=parseInt(v);
+  document.getElementById('cohVal').textContent=k;
+  drawCoherence(k);
+  const scores={2:'Too few — topics blend into mush. Everything looks the same.',3:'Still too few — three buckets for a 700-verse philosophical epic.',4:'Better. You can start to see karma, devotion, knowledge emerging.',5:'Reasonable. Five distinct themes are visible.',6:'Good. Close to the real structure of the Gita.',7:'✓ Our choice. Best coherence score AND every topic stayed distinct.',8:'Marginal drop. Topics start to split in ways that lose meaning.',9:'Two topics are now near-duplicates. Over-partitioned.',10:'Coherence falling. The model is finding noise, not signal.',11:'Getting worse. Stop here.',12:'Clearly over-fit. Topics are meaningless fragments.',13:'Noise.',14:'Maximum N tested — minimum meaning.'};
+  document.getElementById('cohVerdict').textContent=`K=${k}: ${scores[k]||'see the curve'}`;
+}
+window.addEventListener('load',()=>{updateCoherence(7);drawReadability(null);});
+window.addEventListener('resize',()=>{updateCoherence(document.getElementById('cohSlider').value);drawReadability(null);});
+
+// TOPICS
+const topics=[
+  {name:'Path of Action',words:['action','perform','duty','karma','work','result','selfless','body','deed','renounce'],chapters:'Ch3, Ch4, Ch5, Ch18',peak:'Ch3 (0.71)'},
+  {name:'Soul & Liberation',words:['soul','atman','eternal','body','death','born','indestructible','spirit','imperishable','unborn'],chapters:'Ch2, Ch13, Ch15',peak:'Ch2 (0.68)'},
+  {name:'Path of Knowledge',words:['knowledge','wise','gyan','know','understand','truth','realize','ignorance','learn','sage'],chapters:'Ch4, Ch13, Ch18',peak:'Ch4 (0.65)'},
+  {name:'Steady Wisdom',words:['mind','control','senses','steady','peace','detach','calm','balanced','equanimous','stable'],chapters:'Ch2, Ch6',peak:'Ch6 (0.72)'},
+  {name:'Cosmic Vision',words:['supreme','lord','universe','form','divine','beings','worship','manifest','infinite','omnipresent'],chapters:'Ch7, Ch9, Ch10, Ch11',peak:'Ch11 (0.81)'},
+  {name:'Desireless Action',words:['desire','attachment','result','fruit','sacrifice','renounce','unattached','selfless','pure','devotion'],chapters:'Ch5, Ch6, Ch12',peak:'Ch12 (0.69)'},
+  {name:'Divine vs Demonic',words:['nature','quality','sattva','rajas','tamas','guna','divine','demonic','faith','pure'],chapters:'Ch14, Ch16, Ch17',peak:'Ch14 (0.74)'},
+];
+const tt=document.getElementById('topicToggles');
+const td=document.getElementById('topicDetail');
+let activeTopic=null;
+topics.forEach((t,i)=>{
+  const d=document.createElement('div');d.className='toggle';d.textContent=t.name;
+  d.onclick=()=>{
+    document.querySelectorAll('#topicToggles .toggle').forEach(x=>x.classList.remove('on'));
+    d.classList.add('on');
+    td.innerHTML=`<span class="hi">${t.name}</span>\n\nTop words: ${t.words.join(', ')}\nStrongest in: ${t.chapters}\nPeak strength: <span class="g">${t.peak}</span>`;
+  };
+  tt.appendChild(d);
+});
+
+// LDA HEATMAP
+const chapLabels=['Ch1','Ch2','Ch3','Ch4','Ch5','Ch6','Ch7','Ch8','Ch9','Ch10','Ch11','Ch12','Ch13','Ch14','Ch15','Ch16','Ch17','Ch18'];
+const topicLabels=['Path of Action','Soul & Lib.','Path of Know.','Steady Wisdom','Cosmic Vision','Desireless Act.','Divine vs Dem.'];
+const ldaData=[
+  [0.71,0.08,0.05,0.04,0.05,0.04,0.03],
+  [0.22,0.68,0.04,0.02,0.02,0.01,0.01],
+  [0.35,0.12,0.21,0.14,0.06,0.08,0.04],
+  [0.65,0.06,0.08,0.12,0.04,0.03,0.02],
+  [0.12,0.08,0.07,0.62,0.04,0.05,0.02],
+  [0.18,0.12,0.05,0.55,0.03,0.05,0.02],
+  [0.08,0.06,0.04,0.08,0.61,0.07,0.06],
+  [0.06,0.14,0.03,0.08,0.58,0.08,0.03],
+  [0.05,0.04,0.03,0.04,0.72,0.09,0.03],
+  [0.06,0.05,0.11,0.04,0.62,0.08,0.04],
+  [0.04,0.03,0.02,0.03,0.81,0.05,0.02],
+  [0.08,0.06,0.04,0.06,0.08,0.62,0.06],
+  [0.05,0.18,0.12,0.08,0.06,0.08,0.43],
+  [0.04,0.06,0.06,0.05,0.04,0.07,0.68],
+  [0.06,0.12,0.05,0.06,0.08,0.06,0.57],
+  [0.08,0.05,0.06,0.04,0.06,0.04,0.67],
+  [0.09,0.04,0.05,0.06,0.04,0.08,0.64],
+  [0.32,0.08,0.09,0.08,0.06,0.12,0.25],
+];
+function makeHeatmap(){
+  const colors=['#e08a2e','#3fb59f','#9b8ce0','#5fb8e0','#d9b441','#e08aa8','#a8cc6a'];
+  let html=`<table class="hm"><tr><th></th>${chapLabels.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  topicLabels.forEach((tl,ti)=>{
+    html+=`<tr><td class="row-label" style="color:${colors[ti]}">${tl}</td>`;
+    chapLabels.forEach((_,ci)=>{
+      const v=ldaData[ci][ti];
+      const alpha=0.1+v*0.9;
+      html+=`<td style="background:${colors[ti].replace(')',`,${alpha})`.replace('#','rgba(').replace(/([0-9a-f]{2})/gi,(m)=>parseInt(m,16)+','))};color:${v>0.35?'#1a1410':'var(--ink)'}">${v.toFixed(2)}</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</table>`;
+  document.getElementById('ldaHeatmap').innerHTML=html;
+}
+// Simple color approach for heatmap
+function makeHeatmapSimple(){
+  const topColors=['#e08a2e','#3fb59f','#9b8ce0','#5fb8e0','#d9b441','#e08aa8','#a8cc6a'];
+  let html=`<table class="hm" style="min-width:800px"><tr><th style="text-align:left;min-width:110px">Topic</th>${chapLabels.map(c=>`<th style="min-width:36px">${c}</th>`).join('')}</tr>`;
+  topicLabels.forEach((tl,ti)=>{
+    const col=topColors[ti];
+    html+=`<tr><td class="row-label" style="color:${col};font-size:10px">${tl}</td>`;
+    chapLabels.forEach((_,ci)=>{
+      const v=ldaData[ci][ti];
+      const intensity=Math.round(v*220);
+      const bg=v>0.4?col:'var(--bg3)';
+      const fc=v>0.4?'#1a1410':'var(--soft)';
+      html+=`<td style="background:${bg};color:${fc};opacity:${0.3+v*0.7}">${v.toFixed(2)}</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</table>`;
+  document.getElementById('ldaHeatmap').innerHTML=html;
+}
+makeHeatmapSimple();
+
+// ─── SECTION 9: READABILITY ───
+const readData=[
+  {ch:'Ch1',grade:10.2,note:'Narrative — battlefield scene, names, action'},
+  {ch:'Ch2',grade:11.8,note:'Philosophy begins — soul, duty, death introduced'},
+  {ch:'Ch3',grade:11.4,note:'Karma Yoga — action vs inaction debate'},
+  {ch:'Ch4',grade:12.1,note:'Knowledge & sacrifice — abstract taxonomy'},
+  {ch:'Ch5',grade:11.6,note:'Renunciation — practical contrast of two paths'},
+  {ch:'Ch6',grade:12.4,note:'Meditation — technical instructions'},
+  {ch:'Ch7',grade:11.9,note:'Divine knowledge — Krishna\'s nature'},
+  {ch:'Ch8',grade:12.2,note:'Imperishable Brahman — abstract metaphysics'},
+  {ch:'Ch9',grade:11.8,note:'Royal Knowledge — devotional declarations'},
+  {ch:'Ch10',grade:12.0,note:'Divine Glories — long enumeration'},
+  {ch:'Ch11',grade:14.1,note:'Cosmic Vision — language at its limit'},
+  {ch:'Ch12',grade:11.2,note:'Bhakti Yoga — devotee qualities, simpler'},
+  {ch:'Ch13',grade:13.2,note:'Field and Knower — dense taxonomy'},
+  {ch:'Ch14',grade:12.6,note:'Three Gunas — nature categories'},
+  {ch:'Ch15',grade:12.3,note:'Supreme Person — cosmic tree metaphor'},
+  {ch:'Ch16',grade:11.7,note:'Divine/Demonic — practical classification'},
+  {ch:'Ch17',grade:10.8,note:'Three kinds — food, sacrifice, austerity'},
+  {ch:'Ch18',grade:12.8,note:'Liberation — comprehensive summary'},
+];
+function drawReadability(hover){
+  const cv=document.getElementById('readCanvas');
+  if(!cv)return;
+  const ctx=cv.getContext('2d');
+  const W=cv.width=cv.offsetWidth*window.devicePixelRatio;
+  const H=cv.height=220*window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+  const w=cv.offsetWidth,h=220;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='#1c1811';ctx.fillRect(0,0,w,h);
+  const pad={t:20,b:40,l:40,r:10};
+  const cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  const min=9,max=15;
+  const bw=cw/readData.length;
+  readData.forEach((d,i)=>{
+    const x=pad.l+i*bw;
+    const barH=(d.grade-min)/(max-min)*ch;
+    const y=pad.t+ch-barH;
+    const isH=hover===i;
+    ctx.fillStyle=isH?'#f5a83d':'#e08a2e';
+    ctx.globalAlpha=isH?1:0.65;
+    ctx.fillRect(x+2,y,bw-4,barH);
+    ctx.globalAlpha=1;
+    ctx.fillStyle=isH?'#f5a83d':'#8a7a62';
+    ctx.font=`${isH?'700 ':''}9px JetBrains Mono,monospace`;
+    ctx.textAlign='center';
+    ctx.fillText(d.ch,x+bw/2,h-pad.b+14);
+    if(isH){
+      ctx.fillStyle='#f5a83d';ctx.font='700 11px JetBrains Mono,monospace';
+      ctx.fillText(d.grade.toFixed(1),x+bw/2,y-6);
+    }
+  });
+}
+const rc=document.getElementById('readCanvas');
+if(rc){
+  rc.addEventListener('mousemove',e=>{
+    const rect=rc.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    const bw=rc.offsetWidth/readData.length;
+    const i=Math.floor(x/bw);
+    if(i>=0&&i<readData.length){
+      drawReadability(i);
+      document.getElementById('readVerdict').textContent=`Chapter ${i+1}: Grade ${readData[i].grade.toFixed(1)} — ${readData[i].note}`;
+    }
+  });
+  rc.addEventListener('mouseleave',()=>{drawReadability(null);document.getElementById('readVerdict').textContent='← hover a chapter bar to see details';});
+}
+
+// ─── LIVE SENTENCE PARSER — calls REAL spaCy backend ───
+// Change this to your deployed backend URL (see DEPLOY.md)
+const SPACY_API_URL = "http://localhost:5000";
+
+async function parseSentence(){
+  const sentence=document.getElementById('liveInput').value.trim();
+  if(!sentence)return;
+
+  const btn=document.getElementById('parseBtn');
+  const statusEl=document.getElementById('apiStatus');
+  const container=document.getElementById('liveTokens');
+  const out=document.getElementById('liveSpeakerOut');
+
+  btn.disabled=true;btn.textContent='Parsing...';
+  statusEl.style.display='block';
+  statusEl.innerHTML='<span class="cm">→ calling spaCy backend...</span>';
+  container.innerHTML='';
+  out.innerHTML='';
+
+  try{
+    const res=await fetch(`${SPACY_API_URL}/parse`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sentence})
+    });
+
+    if(!res.ok)throw new Error(`Server responded ${res.status}`);
+    const data=await res.json();
+    statusEl.style.display='none';
+    renderParseResult(data);
+
+  }catch(err){
+    statusEl.style.display='block';
+    statusEl.innerHTML=`<span style="color:var(--crim)">⚠ Could not reach the spaCy backend at ${SPACY_API_URL}</span>
+
+This panel needs the Flask + spaCy server running (see DEPLOY.md in the
+project files). If you're viewing this locally, run:
+  <span class="hi">cd gita-spacy-backend && python app.py</span>
+
+If this is deployed, update <span class="hi">SPACY_API_URL</span> at the
+top of the script to your live backend URL.
+
+Error detail: <span class="cm">${err.message}</span>`;
+  }
+
+  btn.disabled=false;btn.textContent='Parse →';
+}
+
+function renderParseResult(data){
+  const container=document.getElementById('liveTokens');
+  const out=document.getElementById('liveSpeakerOut');
+  container.innerHTML='';
+
+  data.tokens.forEach(t=>{
+    let bg='var(--bg3)';let col='var(--soft)';let border='var(--line)';
+    let label=t.pos;let glow='';
+
+    if(t.is_speech_verb){
+      bg='rgba(224,138,46,.2)';col='var(--safb)';border='var(--saf)';
+      label='SPEECH VERB';glow='box-shadow:0 0 12px rgba(224,138,46,.35)';
+    } else if(t.is_subject_of_speech_verb){
+      bg='rgba(63,181,159,.2)';col='var(--teal)';border='var(--teal)';
+      label='nsubj → SPEAKER';glow='box-shadow:0 0 12px rgba(63,181,159,.35)';
+    } else if(t.is_pronoun_blocked){
+      bg='rgba(226,109,92,.18)';col='var(--crim)';border='var(--crim)';
+      label='nsubj (blocked: pronoun)';
+    } else if(t.pos==='PROPN'){
+      bg='rgba(155,140,224,.15)';col='var(--ind)';border='var(--ind)';label='PROPN';
+    } else if(t.pos==='NOUN'){
+      bg='rgba(155,140,224,.08)';col='var(--ind)';border='var(--line)';label='NOUN';
+    } else if(t.pos==='VERB'||t.pos==='AUX'){
+      bg='rgba(224,138,46,.06)';col='var(--faint)';border='var(--line)';label=t.pos;
+    } else if(t.pos==='PRON'){
+      bg='rgba(226,109,92,.08)';col='var(--crim)';border='var(--line)';label='PRON';
+    } else if(['DET','ADP','CCONJ','SCONJ','PART'].includes(t.pos)){
+      bg='var(--bg)';col='var(--faint)';border='var(--lsoft)';label='stop';
+    }
+
+    const tip=`pos_="${t.pos}" · dep_="${t.dep}" · head="${t.head}" · lemma_="${t.lemma}"`;
+
+    const el=document.createElement('div');
+    el.style.cssText='display:inline-flex;flex-direction:column;align-items:center;gap:3px;cursor:default';
+    el.innerHTML=`
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;padding:6px 10px;border-radius:7px;background:${bg};color:${col};border:1px solid ${border};${glow};transition:all .2s" title="${tip}">${t.text}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${col};letter-spacing:.06em;opacity:.8">${label}</div>
+    `;
+    container.appendChild(el);
+  });
+
+  if(!data.speech_verb){
+    out.innerHTML=`<span style="color:var(--crim)">No speech verb found in this sentence.</span>\nCarry-forward rule activates → same speaker as previous verse.`;
+  } else if(!data.raw_subject){
+    out.innerHTML=`Speech verb found: <span style="color:var(--safb)">"${data.speech_verb}"</span>\nBut its nsubj was a pronoun or missing.\n<span style="color:var(--crim)">→ pronoun filter blocks it — carry-forward activates.</span>`;
+  } else {
+    const mapped=data.detected_speaker;
+    const col=mapped==='Krishna'?'var(--saf)':mapped==='Arjuna'?'var(--teal)':'var(--ind)';
+    out.innerHTML=`Speech verb: <span style="color:var(--safb)">"${data.speech_verb}"</span>\nReal spaCy nsubj: <span style="color:var(--teal)">"${data.raw_subject}"</span>\n\nDetected speaker → <span style="color:${col};font-weight:700;font-size:16px">${mapped}</span>`;
+  }
+}
+
+function setExample(txt){
+  document.getElementById('liveInput').value=txt;
+  parseSentence();
+}
+
+document.getElementById('liveInput').addEventListener('keydown',e=>{if(e.key==='Enter')parseSentence();});
+
+// Init tab panels properly
+document.querySelectorAll('.tab-panel').forEach(p=>{if(!p.classList.contains('active'))p.style.display='none';});
+</script>
+</body>
+</html>

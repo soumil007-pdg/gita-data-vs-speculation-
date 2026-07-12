@@ -1,0 +1,31 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "backend",
+      "runtimeExecutable": "/usr/local/bin/python3.13",
+      "runtimeArgs": [
+        "-m",
+        "gunicorn",
+        "--chdir",
+        "/Users/dell/Downloads/gita-analysis-lab/backend",
+        "--bind",
+        "127.0.0.1:5057",
+        "app:app"
+      ],
+      "port": 5057
+    },
+    {
+      "name": "frontend",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8080",
+        "--directory",
+        "/Users/dell/Downloads/gita-analysis-lab/frontend"
+      ],
+      "port": 8080
+    }
+  ]
+}
