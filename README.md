@@ -65,7 +65,7 @@ It already points at `http://localhost:5000` — the live sentence parser
 | Section | What it shows |
 |---|---|
 | 1. Load Data | Dataset structure, the column-name typo gotcha |
-| 2. Speaker Detection | spaCy dependency parsing, live parser (real backend), the two bugs we fixed |
+| 2. Speaker Detection | spaCy dependency parsing, live parser (real backend)|
 | 3. Distribution | Who speaks how much across 700 verses |
 | 4. Word Frequency | Krishna vs Arjuna vocabulary fingerprints |
 | 5. GoEmotions | 28-emotion classification across all verses |
